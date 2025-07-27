@@ -1,8 +1,22 @@
 <script lang="ts">
 	import type { TResult } from '../../stores/aimodel';
+	import { addDataToCollection } from '../../stores/collection';
 
 	let { data }: { data: TResult } = $props();
 	const date = new Date();
+	const addToStore = () => {
+		const final = {
+			text: data.text,
+			description: data.description,
+			important_points: data.important_points,
+			tags: data.tags,
+			date: date.toISOString(),
+			type: 'pending',
+			collectionName: 'Ideas'
+		};
+
+		addDataToCollection(final);
+	};
 </script>
 
 <div
@@ -32,6 +46,7 @@
 		</div>
 		<div class="flex justify-end gap-3">
 			<button
+				onclick={addToStore}
 				aria-label="Save"
 				class="rounded-lg bg-blue-600 p-2 transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
 			>
