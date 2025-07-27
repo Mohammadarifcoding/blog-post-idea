@@ -1,3 +1,5 @@
 <script>
-	// import Home from '../components/page/Home/Home.svelte';
+	import Home from '../pages/Home/Home.svelte';
 </script>
+
+<Home />
