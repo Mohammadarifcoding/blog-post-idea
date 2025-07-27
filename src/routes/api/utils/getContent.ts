@@ -12,9 +12,10 @@ The user will give a topic or context. Suggest highly refined article ideas abou
 
 Respond ONLY with valid JSON in the following format:[
 {
-  "topicName": "<concise topic name>",
+  "text": "<concise topic name>",
   "description": "<concise, human-readable summary>",
-  "important_points": ["point 1", "point 2", "..."]
+  "important_points": ["point 1", "point 2", "..."],
+  "tags":[3 tags related to the article idea and context]
                 }, same formate for other data]
 
 Language of response: ${language || 'English'}.

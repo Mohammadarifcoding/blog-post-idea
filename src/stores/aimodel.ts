@@ -1,16 +1,16 @@
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import type { TModel } from '../types/Model';
 
+export type TResult = {
+	text: string;
+	description: string;
+	important_points: string[];
+	tags: string[];
+};
+
 export interface TAiModel {
-	model: {
-		name: string;
-		displayName: string;
-		description: string;
-	};
-	result: {
-		text: string;
-		ideaDescription: string;
-	};
+	model: TModel;
+	result: TResult[];
 	language: string;
 	loading: boolean;
 }
@@ -24,7 +24,7 @@ const AiModel = writable<TAiModel>({
 			'Stable version of Gemini 1.5 Pro, our mid-size multimodal model that supports up to 2 million tokens, released in May of 2024.',
 		displayName: 'Gemini 1.5 Pro'
 	},
-	result: { text: '', ideaDescription: '' },
+	result: [],
 	language: 'English',
 	loading: false
 });
@@ -38,6 +38,25 @@ const selectModel = (data: Partial<TModel>) => {
 const addLanguages = (language: string) => {
 	AiModel.update((item) => {
 		return { ...item, language };
+	});
+};
+
+const setResult = (data: TResult[]) => {
+	AiModel.update((item) => {
+		return { ...item, result: [...data] };
+	});
+};
+
+const getResults = () => {
+	return derived(AiModel, ($AiModel) => $AiModel.result);
+};
+
+const getLoadingStaus = () => {
+	return derived(AiModel, ($AiModel) => $AiModel.loading);
+};
+const setLoading = (loading: boolean) => {
+	AiModel.update((item) => {
+		return { ...item, loading };
 	});
 };
 
@@ -100,4 +119,4 @@ const addLanguages = (language: string) => {
 
 // export { AiModel, addToAiModel, removeFromAiModel, clearAiModel, updateQuantity };
 
-export { AiModel, selectModel, addLanguages };
+export { AiModel, selectModel, addLanguages, getResults, setResult, getLoadingStaus, setLoading };

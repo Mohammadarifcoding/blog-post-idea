@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { addLanguages, AiModel, selectModel, type TAiModel } from '../../stores/aimodel';
+	import {
+		addLanguages,
+		AiModel,
+		selectModel,
+		setLoading,
+		setResult,
+		type TAiModel
+	} from '../../stores/aimodel';
 	import { preventDefault } from 'svelte/legacy';
 	import type { TModel } from '../../types/Model';
 	import axios from 'axios';
@@ -13,7 +20,7 @@
 	const generateIdes = async () => {
 		try {
 			loading = true;
-			resultLoading = true;
+			setLoading(true);
 			// Placeholder for the function to generate blog post ideas
 			console.log('Generating ideas for:', generatePrompt);
 			const res = await axios.post('/api/generate', {
@@ -26,16 +33,12 @@
 				.replace(/```$/, '') // remove ending ```
 				.trim();
 			let data = JSON.parse(cleaned);
-			console.log(data);
-
-			setTimeout(() => {
-				loading = false;
-				resultLoading = false;
-				alert('Ideas generated!'); // Replace with actual idea generation logic
-			}, 3000); // Simulate a delay for generating ideas
+			setLoading(false);
+			setResult(data);
+			loading = false;
 		} catch (err) {
 			console.log(err);
-			resultLoading = false;
+			setLoading(false);
 			loading = false;
 		}
 	};
@@ -67,77 +70,77 @@
 
 <form
 	onsubmit={preventDefault(generateIdes)}
-	class="mx-auto flex max-w-4xl flex-col items-center gap-2 rounded-xl bg-[#2c2c2f] p-4 shadow-md ring-1 ring-gray-700"
+	class="mx-auto w-full max-w-2xl space-y-4 rounded-2xl border border-blue-200 bg-white/30 p-6 shadow-lg backdrop-blur-md transition hover:shadow-xl"
 >
+	<!-- Prompt Textarea -->
 	<textarea
 		rows="3"
 		oninput={autoResize}
 		bind:value={generatePrompt}
-		placeholder="Ask anything"
-		class="custom-scroll h-[80px] w-full resize-none overflow-auto bg-transparent px-3 py-2 text-white placeholder-gray-400 focus:outline-none"
+		placeholder="💬 What's on your mind?"
+		class="custom-scroll focus:ring--1 w-full resize-none rounded-xl border border-blue-300 bg-white/80 px-4 py-3 text-base text-gray-800 shadow-inner placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-400 focus:outline-none"
 	></textarea>
-	<!-- Left: Tools Dropdown -->
-	<div class="flex w-full flex-row items-center justify-between pl-2">
-		<div class="flex items-center gap-1 text-gray-300">
-			<div class="flex gap-2">
-				<select
-					onchange={(e) => {
-						if (e.target) {
-							const selectedName = (e.target as HTMLSelectElement).value;
-							const selected = models.find((m) => m.name === selectedName);
-							if (selected)
-								selectModel({
-									name: selected.name,
-									displayName: selected.displayName,
-									description: selected.description
-								});
-						}
-					}}
-					value={model.name}
-					class="rounded-xl border border-gray-700 bg-transparent px-4 py-2 text-sm text-white focus:outline-none"
-				>
-					{#each models as model}
-						<option value={model.name} class="bg-[#2c2c2f]">{model.displayName}</option>
-					{/each}
-				</select>
-				<select
-					onchange={(e) => {
-						if (e.target) {
-							const selectedLanguage = (e.target as HTMLSelectElement).value;
-							addLanguages(selectedLanguage);
-						}
-					}}
-					value={language}
-					class="rounded-xl border border-gray-700 bg-transparent px-4 py-2 text-sm text-white focus:outline-none"
-				>
-					{#each languages as language}
-						<option value={language} class="bg-[#2c2c2f]">{language}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
-		<div class="flex items-center gap-3 text-gray-300">
-			<button
-				type="submit"
-				class="flex items-center gap-1 rounded-full bg-blue-600 p-2 text-white hover:bg-blue-700"
-				disabled={loading}
+
+	<!-- Controls -->
+	<div class="flex w-full flex-wrap items-center justify-between gap-4">
+		<!-- Dropdowns -->
+		<div class="flex flex-wrap gap-3">
+			<select
+				onchange={(e) => {
+					const selectedName = (e.target as HTMLSelectElement).value;
+					const selected = models.find((m) => m.name === selectedName);
+					if (selected)
+						selectModel({
+							name: selected.name,
+							displayName: selected.displayName,
+							description: selected.description
+						});
+				}}
+				value={model.name}
+				class="rounded-xl border border-gray-400 bg-white px-4 py-2 text-sm text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-400 focus:outline-none"
 			>
-				{#if loading}
-					<svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="white">
-						<circle cx="12" cy="12" r="10" stroke-opacity="0.3" stroke-width="4" />
-						<path d="M12 2a10 10 0 0 1 10 10" stroke-width="4" stroke-linecap="round" />
-					</svg>
-				{:else}
-					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							d="M5 12h14M12 5l7 7-7 7"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-						/>
-					</svg>
-				{/if}
-			</button>
+				{#each models as model}
+					<option value={model.name}>{model.displayName}</option>
+				{/each}
+			</select>
+
+			<select
+				onchange={(e) => {
+					const selectedLanguage = (e.target as HTMLSelectElement).value;
+					addLanguages(selectedLanguage);
+				}}
+				value={language}
+				class="rounded-xl border border-gray-400 bg-white px-4 py-2 text-sm text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-400 focus:outline-none"
+			>
+				{#each languages as language}
+					<option value={language}>{language}</option>
+				{/each}
+			</select>
 		</div>
+
+		<!-- Submit Button -->
+		<button
+			type="submit"
+			disabled={loading}
+			class="flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2 text-white transition hover:scale-105 hover:from-blue-700 hover:to-blue-600 disabled:opacity-50"
+		>
+			{#if loading}
+				<svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="white">
+					<circle cx="12" cy="12" r="10" stroke-opacity="0.3" stroke-width="4" />
+					<path d="M12 2a10 10 0 0 1 10 10" stroke-width="4" stroke-linecap="round" />
+				</svg>
+				<span>Generating...</span>
+			{:else}
+				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						d="M5 12h14M12 5l7 7-7 7"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+					/>
+				</svg>
+				<span>Generate</span>
+			{/if}
+		</button>
 	</div>
 </form>
