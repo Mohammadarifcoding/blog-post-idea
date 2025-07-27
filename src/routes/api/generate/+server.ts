@@ -9,12 +9,13 @@ export const POST = async ({ request }) => {
 	const ai = new GoogleGenAI({
 		apiKey: GEMINI_API_KEY
 	});
-
+	console.log(userResponse);
 	const response = await ai.models.generateContent({
-		model: 'gemini-2.5-flash',
-		contents: getContentForGemini(userResponse.prompt, 'bangla')
+		model: userResponse.model,
+		contents: getContentForGemini(userResponse.prompt, userResponse.language)
 	});
 	const data = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+	console.log(data);
 	if (!data) {
 		return new Response(JSON.stringify({ result: 'No data found' }), {
 			status: 404,

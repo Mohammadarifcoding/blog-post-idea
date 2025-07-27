@@ -3,6 +3,7 @@
 	import { addLanguages, AiModel, selectModel, type TAiModel } from '../../stores/aimodel';
 	import { preventDefault } from 'svelte/legacy';
 	import type { TModel } from '../../types/Model';
+	import axios from 'axios';
 
 	let generatePrompt = $state('');
 	let models: TModel[] = $state([]);
@@ -10,15 +11,33 @@
 	let loading = $state(false);
 	$inspect(generatePrompt);
 	const generateIdes = async () => {
-		loading = true;
-		resultLoading = true;
-		// Placeholder for the function to generate blog post ideas
-		console.log('Generating ideas for:', generatePrompt);
-		setTimeout(() => {
-			loading = false;
+		try {
+			loading = true;
+			resultLoading = true;
+			// Placeholder for the function to generate blog post ideas
+			console.log('Generating ideas for:', generatePrompt);
+			const res = await axios.post('/api/generate', {
+				prompt: generatePrompt,
+				model: $AiModel.model.name,
+				language: $AiModel.language
+			});
+			let cleaned = res.data.result
+				.replace(/^```json\s*/i, '') // remove starting ```json
+				.replace(/```$/, '') // remove ending ```
+				.trim();
+			let data = JSON.parse(cleaned);
+			console.log(data);
+
+			setTimeout(() => {
+				loading = false;
+				resultLoading = false;
+				alert('Ideas generated!'); // Replace with actual idea generation logic
+			}, 3000); // Simulate a delay for generating ideas
+		} catch (err) {
+			console.log(err);
 			resultLoading = false;
-			alert('Ideas generated!'); // Replace with actual idea generation logic
-		}, 3000); // Simulate a delay for generating ideas
+			loading = false;
+		}
 	};
 	function autoResize(e: any) {
 		e.target.style.height = 'auto'; // Reset height
@@ -78,7 +97,7 @@
 					class="rounded-xl border border-gray-700 bg-transparent px-4 py-2 text-sm text-white focus:outline-none"
 				>
 					{#each models as model}
-						<option value={model.name} class="bg-[#2c2c2f]">{model.name}</option>
+						<option value={model.name} class="bg-[#2c2c2f]">{model.displayName}</option>
 					{/each}
 				</select>
 				<select
