@@ -14,7 +14,7 @@
 	];
 </script>
 
-<div class="h-screen w-64 border-r border-gray-300">
+<div class=" h-[calc(100vh-70px)] max-h-screen w-64 border-r border-gray-300">
 	<nav>
 		<ul>
 			{#each navItems as item}

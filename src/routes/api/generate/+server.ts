@@ -1,10 +1,19 @@
-import { redis } from '$lib/server/redis.js';
+import { GEMINI_API_KEY } from '$env/static/private';
+import { GoogleGenAI } from '@google/genai';
 
-export const GET = async ({ request }) => {
-	// const data = await request.json();
-	const set = await redis.get('idea');
+export const POST = async ({ request }) => {
+	const data = await request.json();
+	console.log(data);
 
-	return new Response(set, {
+	const ai = new GoogleGenAI({
+		apiKey: GEMINI_API_KEY
+	});
+	const response = await ai.models.generateContent({
+		model: 'gemini-2.5-flash',
+		contents: data.prompt
+	});
+
+	return new Response(JSON.stringify(response), {
 		status: 200,
 		headers: {
 			'Content-Type': 'application/json'
