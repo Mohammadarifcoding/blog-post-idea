@@ -1,12 +1,12 @@
 import { derived, writable } from 'svelte/store';
 import type { TModel } from '../types/Model';
 
-export type TResult = {
+export interface TResult {
 	text: string;
 	description: string;
 	important_points: string[];
 	tags: string[];
-};
+}
 
 export interface TAiModel {
 	model: TModel;
