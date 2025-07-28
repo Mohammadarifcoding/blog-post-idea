@@ -1,6 +1,14 @@
 <script>
+	import Category from '../Category/Category.svelte';
+	import CategoryModal from '../modal/CategoryModal.svelte';
 	import SidebarItem from './SidebarItem.svelte';
+	let modalOpen = $state(false);
 
+	const handleSubmit = (e) => {
+		const newCategory = e.detail.name;
+		console.log('Creating category:', newCategory);
+		// Add to your store or call a function
+	};
 	const navItems = [
 		{
 			title: 'Saved',
@@ -22,4 +30,5 @@
 			{/each}
 		</ul>
 	</nav>
+	<Category />
 </div>
