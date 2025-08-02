@@ -1,10 +1,16 @@
 <script lang="ts">
 	import type { TResult } from '../../stores/aimodel';
 	import { addDataToCollection } from '../../stores/collection';
+	import CategoryModal from '../modal/CategoryModal.svelte';
 
 	let { data }: { data: TResult } = $props();
 	const date = new Date();
+	let isOpen = $state(false);
+	let selectedName = $state('Ideas');
 	const addToStore = () => {
+		console.log(selectedName);
+		isOpen = true;
+		console.log(selectedName);
 		const final = {
 			text: data.text,
 			description: data.description,
@@ -12,10 +18,11 @@
 			tags: data.tags,
 			date: date.toISOString(),
 			type: 'pending',
-			collectionName: 'Ideas'
+			collectionName: selectedName
 		};
 
 		addDataToCollection(final);
+		selectedName = 'Ideas';
 	};
 </script>
 
@@ -91,4 +98,7 @@
 			</button>
 		</div>
 	</div>
+	{#if isOpen}
+		<CategoryModal bind:selectedName bind:isOpen />
+	{/if}
 </div>

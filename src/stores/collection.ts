@@ -61,7 +61,7 @@ const addNewCollection = (collectionName: string) => {
 		return [...collections];
 	});
 };
-const getCollectionNames = () =>
+const getCollectionNames = (slug: string) =>
 	derived(collection, ($collection) => $collection.map((c) => c.collectionName));
 
 const getDataFromCollection = (collectionName: string) =>
